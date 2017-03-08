@@ -1,13 +1,10 @@
 package MooX::VariantAttribute;
 
-use 5.006;
 use strict;
 use warnings;
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
 our $VERSION = '0.01';
-
-use Data::Dumper;
 
 sub import {
     my ( $self, @import ) = @_;
@@ -41,7 +38,8 @@ sub import {
                 }
                 return $new;
             }
-            die 'a miserable death';
+            croak sprintf 'Trying to initiate attribute - %s - with something unsupported - %s - valid when - [ %s ]',
+                $name, $obj_isa, join(', ', keys %{$when});
         });
     };
 
@@ -56,7 +54,7 @@ __END__
 
 =head1 NAME
 
-MooX::VariantAttribute - The great new MooX::VariantAttribute!
+MooX::VariantAttribute - The great new MooX::VariantAttribute
 
 =head1 VERSION
 
@@ -66,27 +64,41 @@ Version 0.01
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
+    package My::Multi::Parser
+    use Moo;
     use MooX::VariantAttribute;
 
-    my $foo = MooX::VariantAttribute->new();
-    ...
+    # should accept everything - has - does
+    variant parser => (
+        is  => 'ro',
+        when => [
+            'Test::Parser::One' => {
+                alias => {
+                    parse_string => 'parse',
+                    # parse_file exists 
+                },
+            },
+            'Random::Parser::Two' => {
+                alias => {
+                    # parse_string exists
+                    parse_file   => 'parse_from_file', 
+                },
+            },
+            'Another::Parser::Three' => {
+                alias => { 
+                    parse_string => 'meth_one',
+                    parse_file   => 'meth_two', 
+                },
+            },
+        ],
+    );
 
-=head1 EXPORT
+    ........
 
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
+    my $parser = My::Multi::Parser->new( parser => Another::Parser::Three->new() )->parser;
+    $parser->parser_string();
+    $parser->parse_file();
 
-=head1 SUBROUTINES/METHODS
-
-=head2 function1
-
-=head2 function2
-
-=cut
 
 =head1 AUTHOR
 

@@ -86,7 +86,7 @@ moon_test(
     moon_test_one(
         test  => 'like',
         instance => $death,
-        expected => 'a miserable death',
+        expected => qr/Trying to initiate attribute - parser - with something unsupported - Just::Dont::Exist - valid when/,
     );
 }
 
