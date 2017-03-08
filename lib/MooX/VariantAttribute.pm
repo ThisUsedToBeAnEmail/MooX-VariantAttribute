@@ -26,7 +26,10 @@ sub import {
         my $gen_trigger = sprintf '_trigger_%s', $name;
         $attributes{trigger} = sub { $gen_trigger } unless $attributes{trigger}; 
         $modifiers{has}->($name => %attributes); 
-    
+
+        if (! $target->can( $gen_trigger ) ) { 
+            die 'a miserable death';
+        }
     };
 
     { no strict 'refs'; *{"${target}::variant"} = $variant; }
