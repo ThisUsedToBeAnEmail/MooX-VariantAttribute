@@ -40,76 +40,41 @@ sub meth_two {
 
 package main;
 
-my $t1 = Test::Parser::One->new();
-
-moon_test(
-    name => 'Test::Parser::One'
-    build => {
-        class => 't::odea::Test',
-        args  => {
-            parser => $t1,
-        }
-    },
-    instructions => [
-        {
-            test => 'scalar',
-            func => 'parse_string',
-            expected => 'parse string',
-        }
-        {
-            test => 'scalar',
-            func => 'parse_file',
-            expected => 'parse file',
-        }
-    ],
+my %test_args = (
+    'Test::Parser::One'   => Test::Parser::One->new(),
+    'Random::Parser::Two' => Random::Parser::Two->new(),
+    'Another::Parser::Three' => Another::Parser::Three->new(),
 );
 
-my $t2 = Random::Parser::Two->new();
-
-moon_test(
-    name => 'Random::Parser::Two'
-    build => {
-        class => 't::odea::Test',
-        args  => {
-            parser => $t2,
-        }
-    },
-    instructions => [
-        {
-            test => 'scalar',
-            func => 'parse_string',
-            expected => 'parse string',
-        }
-        {
-            test => 'scalar',
-            func => 'parse_file',
-            expected => 'parse file',
-        }
-    ],
-);
-
-my $t3 = Another::Parser::Three->new();
-
-moon_test(
-    name => 'Another::Parser::Three',
-    build => {
-        class => 't::odea::Test',
-        args  => {
-            parser => $t3,
-        }
-    },
-    instructions => [
-        {
-            test => 'scalar',
-            func => 'parse_string',
-            expected => 'parse string',
+for (keys %test_args) {
+    moon_test(
+        name => $_,
+        build => {
+            class => 't::odea::Test',
+            args  => {
+                parser => $test_args{$_},
+            }
         },
-        {
-            test => 'scalar',
-            func => 'parse_file',
-            expected => 'parse file',
-        }
-    ],
-);
+        instructions => [
+            {
+                test => 'obj',
+                func => 'parser',
+                expected => $_,
+                subtest => [
+                    {
+                        test => 'scalar',
+                        func => 'parse_string',
+                        expected => 'parse string',
+                    }
+                    {
+                        test => 'scalar',
+                        func => 'parse_file',
+                        expected => 'parse file',
+                    }
+                ],
+            }
+        ],
+    );
+}
 
 sunrise();
