@@ -22,9 +22,10 @@ sub import {
     my $variant = sub {
         my ($name, %attributes) = @_;
    
-        my $with = delete $attributes{with};
+        my $when = delete $attributes{when};
+        my $gen_trigger = sprintf '_trigger_%s', $name;
+        $attributes{trigger} = sub { $gen_trigger } unless $attributes{trigger}; 
         $modifiers{has}->($name => %attributes); 
-    
     
     };
 
