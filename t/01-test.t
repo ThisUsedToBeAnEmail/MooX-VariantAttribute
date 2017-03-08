@@ -90,7 +90,7 @@ moon_test(
     );
 }
 
-for (keys %test_args) {
+for (sort keys %test_args) {
     moon_test(
         name => $_,
         build => {

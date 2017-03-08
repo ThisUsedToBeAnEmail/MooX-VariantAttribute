@@ -24,29 +24,21 @@ sub import {
         my ($name, %attributes) = @_;
 
         my $when = {@{ delete $attributes{when} }};
-
-        my $gen_trigger = sprintf '_trigger_%s', $name;
-        $attributes{trigger} = sub { $gen_trigger } unless $attributes{trigger}; 
-        
         $modifiers{has}->($name => %attributes); 
-
-        if (! $target->can( $gen_trigger ) ) { 
-            eval '{
-                package ' . $target . '; 
-                
-                sub ' . $gen_trigger . ' {
-                    my ($self, $new) = @_;
-                    return $new;
-                }
-            }';            
-        }
 
         $modifiers{around}->($name => sub {
             my ($orig, $proto ) = (shift, shift); 
             my $new = $proto->$orig(@_); 
             my $obj_isa = blessed $new;
-            if ($when->{$obj_isa}) {
-                warn Dumper $obj_isa;
+            if (my $options = $when->{$obj_isa}) {
+                for my $alias (keys %{$options->{alias}}) {
+                    next if $new->can($alias);
+                    my $actual = $options->{alias}->{$alias};
+                    {
+                        no strict 'refs';
+                        *{"${obj_isa}::${alias}"} = sub { goto &{"${obj_isa}::${actual}"} };
+                    }
+                }
                 return $new;
             }
             die 'a miserable death';
