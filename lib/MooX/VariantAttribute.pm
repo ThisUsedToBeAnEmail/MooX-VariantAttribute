@@ -21,9 +21,11 @@ sub import {
 
     my $variant = sub {
         my ($name, %attributes) = @_;
+   
+        my $with = delete $attributes{with};
+        $modifiers{has}->($name => %attributes); 
     
-        warn Dumper $name;
-        warn Dumper \%attributes;
+    
     };
 
     { no strict 'refs'; *{"${target}::variant"} = $variant; }

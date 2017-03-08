@@ -46,6 +46,38 @@ my %test_args = (
     'Another::Parser::Three' => Another::Parser::Three->new(),
 );
 
+moon_test(
+    name => 'Test::Parser::One' ,
+    build => {
+        class => 't::odea::Test',
+        args  => {
+            parser => $test_args{'Test::Parser::One'},
+        }
+    },
+    instructions => [
+        {
+            test => 'obj',
+            func => 'parser',
+            expected => 'Test::Parser::One',
+            subtest => [
+                {
+                    test => 'scalar',
+                    func => 'parse',
+                    expected => 'parse string',
+                },
+                {
+                    test => 'scalar',
+                    func => 'parse_file',
+                    expected => 'parse file',
+                }
+            ],
+        }
+    ],
+);
+
+
+
+
 for (keys %test_args) {
     moon_test(
         name => $_,
@@ -65,7 +97,7 @@ for (keys %test_args) {
                         test => 'scalar',
                         func => 'parse_string',
                         expected => 'parse string',
-                    }
+                    },
                     {
                         test => 'scalar',
                         func => 'parse_file',
