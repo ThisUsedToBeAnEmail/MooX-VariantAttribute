@@ -3,6 +3,27 @@ package MooX::VariantAttribute;
 use 5.006;
 use strict;
 use warnings;
+use Carp qw/croak/;
+our $VERSION = '0.01';
+
+sub import {
+    my ( $self, @import ) = @_;
+
+    my $target = caller;
+    my %modifiers;
+    for (qw/with around has/) {
+        unless ($modifiers{$_} = $target->can($_)) {
+            croak "Can't find method <$_> in <$target>";
+        }
+    }
+
+
+
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -13,9 +34,6 @@ MooX::VariantAttribute - The great new MooX::VariantAttribute!
 Version 0.01
 
 =cut
-
-our $VERSION = '0.01';
-
 
 =head1 SYNOPSIS
 
@@ -37,17 +55,9 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head2 function1
 
-=cut
-
-sub function1 {
-}
-
 =head2 function2
 
 =cut
-
-sub function2 {
-}
 
 =head1 AUTHOR
 
@@ -58,9 +68,6 @@ Robert Acock, C<< <thisusedtobeanemail at gmail.com> >>
 Please report any bugs or feature requests to C<bug-moox-variantattribute at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MooX-VariantAttribute>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 

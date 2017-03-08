@@ -7,6 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
+    use_ok( 'Moo' ) || print "Bail out!\n";
     use_ok( 'MooX::VariantAttribute' ) || print "Bail out!\n";
 }
 
