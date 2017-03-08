@@ -37,6 +37,10 @@ sub meth_two {
     return 'parse file';
 }
 
+package Just::Dont::Exist;
+
+use Moo;
+
 package main;
 
 use t::odea::Test2;
@@ -74,6 +78,17 @@ moon_test(
         }
     ],
 );
+
+{
+    eval { t::odea::Test2->new( parser => Just::Dont::Exist->new )->parser };
+    my $death = $@;
+
+    moon_test_one(
+        test  => 'like',
+        instance => $death,
+        expected => 'a miserable death',
+    );
+}
 
 for (keys %test_args) {
     moon_test(

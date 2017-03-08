@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Carp qw/croak/;
+use Scalar::Util qw/blessed/;
 our $VERSION = '0.01';
 
 use Data::Dumper;
@@ -21,10 +22,12 @@ sub import {
 
     my $variant = sub {
         my ($name, %attributes) = @_;
-   
-        my $when = delete $attributes{when};
+
+        my $when = {@{ delete $attributes{when} }};
+
         my $gen_trigger = sprintf '_trigger_%s', $name;
         $attributes{trigger} = sub { $gen_trigger } unless $attributes{trigger}; 
+        
         $modifiers{has}->($name => %attributes); 
 
         if (! $target->can( $gen_trigger ) ) { 
@@ -41,8 +44,12 @@ sub import {
         $modifiers{around}->($name => sub {
             my ($orig, $proto ) = (shift, shift); 
             my $new = $proto->$orig(@_); 
-            warn Dumper $new;
-            return $new;
+            my $obj_isa = blessed $new;
+            if ($when->{$obj_isa}) {
+                warn Dumper $obj_isa;
+                return $new;
+            }
+            die 'a miserable death';
         });
     };
 
