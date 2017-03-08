@@ -28,8 +28,22 @@ sub import {
         $modifiers{has}->($name => %attributes); 
 
         if (! $target->can( $gen_trigger ) ) { 
-            die 'a miserable death';
+            eval '{
+                package ' . $target . '; 
+                
+                sub ' . $gen_trigger . ' {
+                    my ($self, $new) = @_;
+                    return $new;
+                }
+            }';            
         }
+
+        $modifiers{around}->($name => sub {
+            my ($orig, $proto ) = (shift, shift); 
+            my $new = $proto->$orig(@_); 
+            warn Dumper $new;
+            return $new;
+        });
     };
 
     { no strict 'refs'; *{"${target}::variant"} = $variant; }
