@@ -3,9 +3,9 @@ package t::odea::Test;
 use Moo;
 use MooX::VariantAttribute;
 
-has parser => (
-    is => 'ro',
-    variant => {
+variant parser => (
+    is  => 'ro',
+    when => [
         'Test::Parser::One' => {
             alias => {
                 parse_string => 'parse',
@@ -24,7 +24,7 @@ has parser => (
                 parse_file   => 'meth_two', 
             },
         },
-    }
+    ],
 );
 
 =pod
