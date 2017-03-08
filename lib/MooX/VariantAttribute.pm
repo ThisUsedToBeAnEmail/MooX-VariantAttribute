@@ -6,6 +6,8 @@ use warnings;
 use Carp qw/croak/;
 our $VERSION = '0.01';
 
+use Data::Dumper;
+
 sub import {
     my ( $self, @import ) = @_;
 
@@ -17,8 +19,16 @@ sub import {
         }
     }
 
+    my $variant = sub {
+        my ($name, %attributes) = @_;
+    
+        warn Dumper $name;
+        warn Dumper \%attributes;
+    };
 
+    { no strict 'refs'; *{"${target}::variant"} = $variant; }
 
+    return 1;
 }
 
 1;
