@@ -68,7 +68,7 @@ Version 0.01
     use Moo;
     use MooX::VariantAttribute;
 
-    # should accept everything - has - does
+    # variant accepts everything - has - does
     variant parser => (
         is  => 'ro',
         when => [
@@ -96,7 +96,7 @@ Version 0.01
     ........
 
     my $parser = My::Multi::Parser->new( parser => Another::Parser::Three->new() )->parser;
-    $parser->parser_string();
+    $parser->parse_string();
     $parser->parse_file();
 
 

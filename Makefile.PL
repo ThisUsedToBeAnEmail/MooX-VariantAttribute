@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Module::Metadata;
 
 WriteMakefile(
     NAME             => 'MooX::VariantAttribute',
@@ -16,11 +17,26 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
+        'Moonshine::Test' => 0.13,
     },
     PREREQ_PM => {
-        #'ABC'              => 1.6,
-        #'Foo::Bar::Module' => 5.0401,
+        'Carp' => 0,
+        'Scalar::Util' => 0,
+        'Moo' => '2.003001',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MooX-VariantAttribute-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/ThisUsedToBeAnEmail/MooX-VariantAttribute.git',
+                web  => 'https://github.com/ThisUsedToBeAnEmail/MooX-VariantAttribute',
+            },
+        },
+    },
+    META_ADD => {
+        provides => Module::Metadata->provides(version => '2', dir => 'lib'),
+	}, 
 );
