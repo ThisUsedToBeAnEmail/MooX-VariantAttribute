@@ -4,18 +4,14 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
-our $VERSION = '0.01';
+use MooX::ReturnModifiers;
+our $VERSION = '0.02';
 
 sub import {
     my ( $self, @import ) = @_;
 
     my $target = caller;
-    my %modifiers;
-    for (qw/with around has/) {
-        unless ($modifiers{$_} = $target->can($_)) {
-            croak "Can't find method <$_> in <$target>";
-        }
-    }
+    my %modifiers = return_modifiers($target, [qw/has around/]);
 
     my $variant = sub {
         my ($name, %attributes) = @_;
@@ -54,11 +50,11 @@ __END__
 
 =head1 NAME
 
-MooX::VariantAttribute - The great new MooX::VariantAttribute
+MooX::VariantAttribute - a щ（ﾟДﾟщ）Attribute...
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

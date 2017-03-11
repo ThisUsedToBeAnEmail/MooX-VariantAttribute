@@ -23,6 +23,7 @@ WriteMakefile(
         'Carp' => 0,
         'Scalar::Util' => 0,
         'Moo' => '2.003001',
+        'MooX::ReturnModifiers' => '0.03',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MooX-VariantAttribute-*' },
