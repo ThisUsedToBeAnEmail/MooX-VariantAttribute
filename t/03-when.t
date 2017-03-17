@@ -1,6 +1,6 @@
 use Test::More;
 
-use Types::Standard qw/Str Obj/;
+use Types::Standard qw/Str Object/;
 
 {
     package One::Two::Three;
@@ -22,7 +22,7 @@ my $when = {
     'three' => {
         run => sub { return "$_[1] - how hard will i fall if I live a double life"; },
     },
-}
+};
 
 is $obj->_when_variant('one', Str, $when), 'one - cold, cold, cold inside', 'okay we have one';
 is $obj->_when_variant('two', Str, $when), 'two - don\'t look at me that way', 'okay we have two';
@@ -64,7 +64,7 @@ my $when2 = {
 };
 
 my $parser = Random::Parser::Two->new();
-my $parser = $obj->_when_variant($parser, Obj, $when2);
+my $parser = $obj->_when_variant($parser, Object, $when2);
 is( $parser->parse_file, 'parse file', 'alias' );
 
 done_testing();

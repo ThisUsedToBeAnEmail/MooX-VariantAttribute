@@ -18,7 +18,6 @@ sub import {
 
     };
 
-    $modifiers{with}->( 'MooX::VariantAttribute::Role' );
 
     { no strict 'refs'; *{"${target}::variant"} = $variant; }
 
