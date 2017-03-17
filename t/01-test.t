@@ -2,45 +2,53 @@ use Moonshine::Test qw/:all/;
 
 use t::odea::Test;
 
-package Test::Parser::One;
+{
+    package test::parser::one;
 
-use Moo;
+    use moo;
 
-sub parse {
-    return 'parse string';
+    sub parse {
+        return 'parse string';
+    }
+
+    sub parse_file {
+        return 'parse file';
+    }
 }
 
-sub parse_file {
-    return 'parse file';
+{
+    package Random::Parser::Two;
+
+    use Moo;
+
+    sub parse_string {
+        return 'parse string';
+    }
+
+    sub parse_from_file {
+        return 'parse file';
+    }
 }
 
-package Random::Parser::Two;
+{
+    package Another::Parser::Three;
 
-use Moo;
+    use Moo;
 
-sub parse_string {
-    return 'parse string';
+    sub meth_one {
+        return 'parse string';
+    }
+
+    sub meth_two {
+        return 'parse file';
+    }
 }
 
-sub parse_from_file {
-    return 'parse file';
+{
+    package Just::Dont::Exist;
+
+    use Moo;
 }
-
-package Another::Parser::Three;
-
-use Moo;
-
-sub meth_one {
-    return 'parse string';
-}
-
-sub meth_two {
-    return 'parse file';
-}
-
-package Just::Dont::Exist;
-
-use Moo;
 
 package main;
 

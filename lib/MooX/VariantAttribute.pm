@@ -11,33 +11,14 @@ sub import {
     my ( $self, @import ) = @_;
 
     my $target = caller;
-    my %modifiers = return_modifiers($target, [qw/has around/]);
+    my %modifiers = return_modifiers($target, [qw/has around with/]);
 
     my $variant = sub {
         my ($name, %attributes) = @_;
 
-        my $when = {@{ delete $attributes{when} }};
-        $modifiers{has}->($name => %attributes); 
-
-        $modifiers{around}->($name => sub {
-            my ($orig, $proto) = (shift, shift); 
-            my $new = $proto->$orig(@_); 
-            my $obj_isa = blessed $new;
-            if (my $options = $when->{$obj_isa}) {
-                for my $alias (keys %{$options->{alias}}) {
-                    next if $new->can($alias);
-                    my $actual = $options->{alias}->{$alias};
-                    {
-                        no strict 'refs';
-                        *{"${obj_isa}::${alias}"} = sub { goto &{"${obj_isa}::${actual}"} };
-                    }
-                }
-                return $new;
-            }
-            croak sprintf 'Trying to initiate attribute - %s - with something unsupported - %s - valid when - [ %s ]',
-                $name, $obj_isa, join(', ', keys %{$when});
-        });
     };
+
+    $modifiers{with}->( 'MooX::VariantAttribute::Role' );
 
     { no strict 'refs'; *{"${target}::variant"} = $variant; }
 
