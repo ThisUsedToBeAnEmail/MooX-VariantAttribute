@@ -27,6 +27,22 @@ variant parser => (
     ],
 );
 
+variant refs => (
+    is  => 'ro',
+    given => sub { ref $_[0] }, 
+    when => [
+        'SCALAR' => { 
+            run => sub { return "I'm a Scalar - $_[0]" },
+        },
+        'HASH' => {
+            run => sub { return "I'm a Hash -" . join ',', map { sprintf '%s=>%s', $_, $_[0]->{$_} } keys $_[0]; },
+        },
+        'ARRAY' => {
+            run => sub { return "I'm a Array - " join ',', @{ $_[0] } },
+        },
+    ],
+);
+
 =pod
 
     my $simple_parser = t::odea::Test->new( parser => $parser )->parser;
