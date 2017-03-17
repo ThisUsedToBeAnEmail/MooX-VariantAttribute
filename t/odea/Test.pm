@@ -5,6 +5,7 @@ use MooX::VariantAttribute;
 
 variant parser => (
     is  => 'ro',
+    given =>  Obj,
     when => [
         'Test::Parser::One' => {
             alias => {
@@ -27,18 +28,40 @@ variant parser => (
     ],
 );
 
+has thing => ( 
+    is => 'ro',
+    default => sub { 'one' },  
+);
+
+variant string => (
+    is  => 'ro',
+    given => Str,
+    when => [
+        'one' => { 
+            run => sub { return "$_[1] - cold, cold, cold inside" },
+        },
+        'two' => {
+            run => sub { return "$_[1] - don't look at me that way"; },
+        },
+        'three' => {
+            run => sub { return "$_[1] - how hard will i fall if I live a double life"; },
+        },
+    ],
+    default => sub { $_[0]->thing },
+);
+
 variant refs => (
     is  => 'ro',
     given => sub { ref $_[0] }, 
     when => [
         'SCALAR' => { 
-            run => sub { return "I'm a Scalar - $_[0]" },
+            run => sub { return "I'm a Scalar - $_[1]" },
         },
         'HASH' => {
-            run => sub { return "I'm a Hash -" . join ',', map { sprintf '%s=>%s', $_, $_[0]->{$_} } keys %{ $_[0] }; },
+            run => sub { return "I'm a Hash -" . join ',', map { sprintf '%s=>%s', $_, $_[1]->{$_} } keys %{ $_[1] }; },
         },
         'ARRAY' => {
-            run => sub { return "I'm a Array - " . join ',', @{ $_[0] } },
+            run => sub { return "I'm a Array - " . join ',', @{ $_[1] } },
         },
     ],
 );
