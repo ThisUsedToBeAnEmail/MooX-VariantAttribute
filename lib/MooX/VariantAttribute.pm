@@ -20,7 +20,7 @@ sub import {
         $modifiers{has}->($name => %attributes); 
 
         $modifiers{around}->($name => sub {
-            my ($orig, $proto ) = (shift, shift); 
+            my ($orig, $proto) = (shift, shift); 
             my $new = $proto->$orig(@_); 
             my $obj_isa = blessed $new;
             if (my $options = $when->{$obj_isa}) {
