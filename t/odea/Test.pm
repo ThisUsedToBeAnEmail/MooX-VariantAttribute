@@ -4,7 +4,6 @@ use Moo;
 use MooX::VariantAttribute;
 
 variant parser => (
-    is  => 'ro',
     given =>  Obj,
     when => [
         'Test::Parser::One' => {
@@ -28,13 +27,7 @@ variant parser => (
     ],
 );
 
-has thing => ( 
-    is => 'ro',
-    default => sub { 'one' },  
-);
-
 variant string => (
-    is  => 'ro',
     given => Str,
     when => [
         'one' => { 
@@ -47,11 +40,9 @@ variant string => (
             run => sub { return "$_[1] - how hard will i fall if I live a double life"; },
         },
     ],
-    default => sub { $_[0]->thing },
 );
 
 variant refs => (
-    is  => 'ro',
     given => sub { ref $_[0] }, 
     when => [
         'SCALAR' => { 
@@ -68,10 +59,20 @@ variant refs => (
 
 =pod
 
-    my $simple_parser = t::odea::Test->new( parser => $parser )->parser;
+    has parser => (
+        is => 'rw',
+        setter => '_set_parser',
+    );
 
-    $simple_parser->parse_string;
-    $simple_parser->parse_file;_
+    has string => (
+        is => 'rw',
+        setter => '_set_string',
+    );
+
+    has refs => (
+        is => 'rw',
+        setter => '_set_refs',
+    );
 
 =cut
 
