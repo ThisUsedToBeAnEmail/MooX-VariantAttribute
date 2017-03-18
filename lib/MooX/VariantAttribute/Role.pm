@@ -16,9 +16,9 @@ sub _given_when {
 
     my $find = $self->_find_from_given(@_);
 
-    return if $self->variant_last_value->{$attr}
+    return undef if $self->variant_last_value->{$attr}
       and $self->variant_last_value->{$attr} =~ m/^$find$/;
-
+    
     if ( my $found = $when->{$find} ) {
         if ( $found->{alias} ) {
             for my $alias ( keys %{ $found->{alias} } ) {
@@ -33,9 +33,8 @@ sub _given_when {
 
         $found->{run} and $set = $found->{run}->( $self, $set );
 
-        $self->variant_last_value->{$attr} = $set;
-
-        return $set;
+        $self->variant_last_value->{$attr} =  blessed $set // $set;
+        return $self->$attr($set);
     }
 
     croak sprintf 'Could not find - %s - in when spec for attribute - %s',

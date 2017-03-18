@@ -7,6 +7,10 @@ use Types::Standard qw/Str Object/;
 
     use Moo;
     with 'MooX::VariantAttribute::Role';
+   
+    has test => (
+        is => 'rw',
+    );
     
 }
 

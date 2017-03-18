@@ -6,8 +6,7 @@ use Types::Standard qw/Str Object/;
     package One::Two::Three;
 
     use Moo;
-    with 'MooX::VariantAttribute::Role';
-    
+    with 'MooX::VariantAttribute::Role';    
 }
 
 my $obj = One::Two::Three->new();

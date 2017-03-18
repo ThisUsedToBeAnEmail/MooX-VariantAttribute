@@ -129,4 +129,28 @@ for (sort keys %test_args) {
     );
 }
 
+moon_test(
+    name => 'string test',
+    build => {
+        class => 't::odea::Test',
+        args  => {}
+    },
+    instructions => [
+        {
+            test => 'scalar',
+            func => 'string',
+            args => [ 'one' ],
+            args_list => 1,
+            expected => 'one - cold, cold, cold inside',
+        },
+        {
+            test => 'scalar',
+            func => 'string',
+            args => [],
+            args_list => 1,
+            expected => 'one - cold, cold, cold inside',
+        }  
+    ],
+);
+
 sunrise();
