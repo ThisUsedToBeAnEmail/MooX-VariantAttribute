@@ -5,7 +5,7 @@ use MooX::VariantAttribute;
 
 variant parser => (
     given => Obj,
-    when => [
+    when => {
         'Test::Parser::One' => {
             alias => {
                 parse_string => 'parse',
@@ -24,37 +24,37 @@ variant parser => (
                 parse_file   => 'meth_two', 
             },
         },
-    ],
+    },
 );
 
 variant string => (
     given => Str,
-    when => [
+    when => {
         'one' => { 
-            run => sub { return "$_[0] - cold, cold, cold inside" },
+            run => sub { return "$_[1] - cold, cold, cold inside" },
         },
         'two' => {
-            run => sub { return "$_[0] - don't look at me that way"; },
+            run => sub { return "$_[1] - don't look at me that way"; },
         },
         'three' => {
-            run => sub { return "$_[0] - how hard will i fall if I live a double life"; },
+            run => sub { return "$_[1] - how hard will i fall if I live a double life"; },
         },
-    ],
+    },
 );
 
 variant refs => (
-    given => sub { ref $[0] }, 
-    when => [
+    given => sub { shift; ref $_[1] or ref \@_ }, 
+    when => {
         'SCALAR' => { 
-            run => sub { return "I'm a Scalar - $_[0]" },
+            run => sub { return "Ref returned - SCALAR - $_[1]" },
         },
         'HASH' => {
-            run => sub { return "I'm a Hash -" . join ',', map { sprintf '%s=>%s', $_, $_[0]->{$_} } keys %{ $_[0] }; },
+            run => sub { return "Ref returned - HASH -" . join ',', map { sprintf '%s=>%s', $_, $_[1]->{$_} } keys %{ $_[1] }; },
         },
         'ARRAY' => {
-            run => sub { return "I'm a Array - " . join ',', @{ $_[0] } },
+            run => sub { return "Ref returned - ARRAY - " . join ',', @{ $_[1] } },
         },
-    ],
+    },
 );
 
 =pod
