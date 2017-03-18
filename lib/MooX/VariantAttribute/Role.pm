@@ -38,7 +38,7 @@ sub _find_from_given {
         $display_name eq 'Object' and $given->($set) and return blessed $set;
         $display_name eq 'Str' and return $given->($set); 
     } elsif ( $ref_given eq 'CODE' ) {
-        return $given->($set);
+        return $given->($self, $set);
     }
 
     return $set;

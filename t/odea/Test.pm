@@ -2,9 +2,10 @@ package t::odea::Test;
 
 use Moo;
 use MooX::VariantAttribute;
+use Types::Standard qw/Object Str/;
 
 variant parser => (
-    given => Obj,
+    given => Object,
     when => {
         'Test::Parser::One' => {
             alias => {

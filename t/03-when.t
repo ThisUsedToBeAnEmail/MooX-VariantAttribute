@@ -79,11 +79,11 @@ my $when3 = {
     },
 };
 
-my $scalar = $obj->_given_when('HEY', sub { ref $_[0] or ref \$_[0] }, $when3);
+my $scalar = $obj->_given_when('HEY', sub { ref $_[1] or ref \$_[1] }, $when3);
 is( $scalar, 'I am a SCALAR', 'ref SCALAR' );
-my $hash = $obj->_given_when({ one => 'two' }, sub { ref $_[0] }, $when3);
+my $hash = $obj->_given_when({ one => 'two' }, sub { ref $_[1] }, $when3);
 is( $hash, 'I am a HASH', 'ref HASH' );
-my $array = $obj->_given_when([qw/one two/], sub { ref $_[0] }, $when3);
+my $array = $obj->_given_when([qw/one two/], sub { ref $_[1] }, $when3);
 is( $array, 'I am a ARRAY', 'ref ARRAY' );
 
 done_testing();

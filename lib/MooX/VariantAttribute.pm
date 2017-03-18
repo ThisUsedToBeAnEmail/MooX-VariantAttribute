@@ -8,19 +8,41 @@ use MooX::ReturnModifiers;
 our $VERSION = '0.02';
 
 sub import {
-    my ( $self, @import ) = @_;
-
+    my ( $package, @import ) = @_;
+    
     my $target = caller;
     my %modifiers = return_modifiers($target, [qw/has around with/]);
 
     my $variant = sub {
-        my ($name, %attributes) = @_;
+        my ($name, %spec) = @_;
+       
+        $modifiers{has}->(
+            $name => _construct_attribute($name, %spec)
+        );
+
+        $modifiers{around}->(
+            $name, sub {
+                my ($orig, $self) = (shift, shift);
+                my $value = $self->$orig;
+                return $self->_given_when($value, $spec{given}, $spec{when}, $name);
+            }
+        );
 
     };
+
+    $target->can('_given_when') or $modifiers{with}->( 'MooX::VariantAttribute::Role' );
 
     { no strict 'refs'; *{"${target}::variant"} = $variant;}
 
     return 1;
+}
+
+sub _construct_attribute {
+    my ($name, %spec) = @_;
+    
+    return (
+        is => $spec{is} ? $spec{is} : 'rw',
+    );
 }
 
 1;

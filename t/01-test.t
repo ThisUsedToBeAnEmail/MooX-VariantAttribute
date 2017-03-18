@@ -3,9 +3,9 @@ use Moonshine::Test qw/:all/;
 use t::odea::Test;
 
 {
-    package test::parser::one;
+    package Test::Parser::One;
 
-    use moo;
+    use Moo;
 
     sub parse {
         return 'parse string';
@@ -94,7 +94,7 @@ moon_test(
     moon_test_one(
         test  => 'like',
         instance => $death,
-        expected => qr/Trying to initiate attribute - parser - with something unsupported - Just::Dont::Exist - valid when/,
+        expected => qr/Could not find - Just::Dont::Exist/
     );
 }
 
