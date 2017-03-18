@@ -21,23 +21,28 @@ sub _given_when {
     
     $self->variant_last_value->{$attr}->{find} = $find;
     
-    if ( my $found = $when->{$find} ) {
-        if ( $found->{alias} ) {
-            for my $alias ( keys %{ $found->{alias} } ) {
-                next if $set->can($alias);
-                my $actual = $found->{alias}->{$alias};
-                {
-                    no strict 'refs';
-                    *{"${find}::${alias}"} = sub { goto &{"${find}::${actual}"} };
+    my @when = @{ $when };
+    while (@when) {
+        my $check = shift @when;
+        my $found = shift @when;
+        if ( _struct_the_same($check, $find) ) {
+            if ( $found->{alias} ) {
+                for my $alias ( keys %{ $found->{alias} } ) {
+                    next if $set->can($alias);
+                    my $actual = $found->{alias}->{$alias};
+                    {
+                        no strict 'refs';
+                        *{"${find}::${alias}"} = sub { goto &{"${find}::${actual}"} };
+                    }
                 }
             }
+
+            $found->{run} and $set = $found->{run}->( $self, $set, $found );
+
+            $self->variant_last_value->{$attr}->{set} = $set;
+
+            return $self->$attr($set);
         }
-
-        $found->{run} and $set = $found->{run}->( $self, $set, $found );
-
-        $self->variant_last_value->{$attr}->{set} = $set;
-
-        return $self->$attr($set);
     }
 
     croak sprintf 'Could not find - %s - in when spec for attribute - %s',

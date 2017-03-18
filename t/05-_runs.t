@@ -9,11 +9,11 @@ use Test::More;
 
     variant switch => (
         given => Str,
-        when => {
+        when => [
             one => { run => sub { return 'easy' } },
             two => { run => sub { return [qw/thinking to/] } },
             three => { run => sub { return { need => 'to' } } },
-        }
+        ],
     );
 
 }

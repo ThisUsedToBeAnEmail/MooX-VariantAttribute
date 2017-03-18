@@ -16,7 +16,7 @@ use Types::Standard qw/Str Object/;
 
 my $obj = One::Two::Three->new();
 
-my $when = {
+my $when = [
     'one' => { 
         run => sub { return "$_[1] - cold, cold, cold inside" },
     },
@@ -26,7 +26,7 @@ my $when = {
     'three' => {
         run => sub { return "$_[1] - how hard will i fall if I live a double life"; },
     },
-};
+];
 
 is $obj->_given_when('one', Str, $when, 'test'), 'one - cold, cold, cold inside', 'okay we have one';
 is $obj->_given_when('two', Str, $when, 'test'), 'two - don\'t look at me that way', 'okay we have two';
@@ -46,7 +46,7 @@ is $obj->_given_when('three', Str, $when, 'test'), 'three - how hard will i fall
     }
 }
 
-my $when2 = {    
+my $when2 = [
     'Test::Parser::One' => {
         alias => {
             parse_string => 'parse',
@@ -65,13 +65,13 @@ my $when2 = {
             parse_file   => 'meth_two', 
         },
     },
-};
+];
 
 my $parser = Random::Parser::Two->new();
 my $parser = $obj->_given_when($parser, Object, $when2, 'test');
 is( $parser->parse_file, 'parse file', 'alias' );
 
-my $when3 = {    
+my $when3 = [    
     'SCALAR' => {
         run => sub { return 'I am a SCALAR' },
     },
@@ -81,7 +81,7 @@ my $when3 = {
     'ARRAY' => {
         run => sub { return 'I am a ARRAY' },
     },
-};
+];
 
 my $scalar = $obj->_given_when('HEY', sub { ref $_[1] or ref \$_[1] }, $when3, 'test');
 is( $scalar, 'I am a SCALAR', 'ref SCALAR' );
