@@ -4,6 +4,12 @@ use Moo::Role;
 use Scalar::Util qw/blessed/;
 use Carp qw/croak/;
 
+has variant_last_value => (
+    is => 'rw',
+    lazy => 1,
+    default => sub { { } },
+);
+
 sub _given_when {
 	my ($self) = shift;
     my ($set, $given, $when, $attr) = @_;
