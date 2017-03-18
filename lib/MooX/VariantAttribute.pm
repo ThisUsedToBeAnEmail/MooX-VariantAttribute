@@ -39,6 +39,7 @@ sub _construct_attribute {
     return (
         is => $spec{is} ? $spec{is} : 'rw',
         trigger => $trigger,
+        lazy => 1,
     );
 }
 

@@ -48,10 +48,31 @@ sub _given_when {
 sub _variant_last_value {
     my ($self, $attr, $value, $set) = @_;
 
-    return undef unless ref \$set eq 'SCALAR';
     return undef unless $self->variant_last_value->{$attr};
-    return 1 if $self->variant_last_value->{$attr}->{$value} =~ m/^$set$/;
-    return undef; 
+    return _struct_the_same($self->variant_last_value->{$attr}->{$value}, $set);
+}
+
+sub _struct_the_same {
+    my ($stored, $passed) = @_;
+    
+    my $stored_ref = ref($stored) || ref(\$stored);
+    my $passed_ref = ref($passed) || ref(\$passed);
+    $stored_ref eq $passed_ref or return undef;
+    
+    if ( $stored_ref eq 'SCALAR') {
+        return ($stored =~ m/^$passed$/) ? 1 : undef;
+    } elsif ($stored_ref eq 'HASH') {
+        for (keys %{$passed}) {
+            _struct_the_same($stored->{$_}, $passed->{$_}) or return undef;    
+        }
+        return 1;
+    } elsif ($stored_ref eq 'ARRAY') {
+        for ( scalar @{$passed} - 1 ) {
+            _struct_the_same($stored->[$_], $passed->[$_]) or return undef;
+        }
+        return 1;
+    } 
+    return 1;
 }
 
 sub _find_from_given {
