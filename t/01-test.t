@@ -149,8 +149,89 @@ moon_test(
             args => [],
             args_list => 1,
             expected => 'one - cold, cold, cold inside',
-        }  
+        },
+        {
+            test => 'scalar',
+            func => 'string',
+            args => [ 'two' ],
+            args_list => 1,
+            expected => 'two - don\'t look at me that way',
+        },
+        {
+            test => 'scalar',
+            func => 'string',
+            args => [],
+            args_list => 1,
+            expected => 'two - don\'t look at me that way',
+        },
+         {
+            test => 'scalar',
+            func => 'string',
+            args => [ 'three' ],
+            args_list => 1,
+            expected => 'three - how hard will i fall if I live a double life',
+        },
+        {
+            test => 'scalar',
+            func => 'string',
+            args => [],
+            args_list => 1,
+            expected => 'three - how hard will i fall if I live a double life',
+        },
     ],
 );
+
+moon_test(
+    name => 'ref test',
+    build => {
+        class => 't::odea::Test',
+        args  => {}
+    },
+    instructions => [
+        {
+            test => 'scalar',
+            func => 'refs',
+            args => [ 'one' ],
+            args_list => 1,
+            expected => 'refs returned - SCALAR - one',
+        },
+        {
+            test => 'scalar',
+            func => 'refs',
+            args => [],
+            args_list => 1,
+            expected => 'refs returned - SCALAR - one',
+        },
+        {
+            test => 'scalar',
+            func => 'refs',
+            args => [ { one => 'two' } ],
+            args_list => 1,
+            expected => 'refs returned - HASH - one=>two',
+        },
+        {
+            test => 'scalar',
+            func => 'refs',
+            args => [ ],
+            args_list => 1,
+            expected => 'refs returned - HASH - one=>two',
+        },
+        {
+            test => 'scalar',
+            func => 'refs',
+            args => [[qw/one two/]],
+            args_list => 1,
+            expected => 'refs returned - ARRAY - one,two',
+        },
+        {
+            test => 'scalar',
+            func => 'refs',
+            args => [ ],
+            args_list => 1,
+            expected => 'refs returned - ARRAY - one,two',
+        },
+    ],
+);
+
 
 sunrise();

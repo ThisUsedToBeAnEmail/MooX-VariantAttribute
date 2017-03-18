@@ -14,10 +14,16 @@ sub _given_when {
     my ($self) = shift;
     my ( $set, $given, $when, $attr ) = @_;
 
+    return undef if $self->variant_last_value->{$attr}
+        and ref \$set eq 'SCALAR' 
+            and $self->variant_last_value->{$attr}->{set} =~ m/^$set$/;
+
     my $find = $self->_find_from_given(@_);
 
     return undef if $self->variant_last_value->{$attr}
-      and $self->variant_last_value->{$attr} =~ m/^$find$/;
+        and $self->variant_last_value->{$attr}->{find} =~ m/^$find$/;
+    
+    $self->variant_last_value->{$attr}->{find} = $find;
     
     if ( my $found = $when->{$find} ) {
         if ( $found->{alias} ) {
@@ -31,9 +37,10 @@ sub _given_when {
             }
         }
 
-        $found->{run} and $set = $found->{run}->( $self, $set );
+        $found->{run} and $set = $found->{run}->( $self, $set, $found );
 
-        $self->variant_last_value->{$attr} =  blessed $set // $set;
+        $self->variant_last_value->{$attr}->{set} = $set;
+
         return $self->$attr($set);
     }
 
@@ -47,11 +54,13 @@ sub _find_from_given {
     my $ref_given = ref $given;
     if ( $ref_given eq 'Type::Tiny' ) {
         my $display_name = $given->display_name;
-        $display_name eq 'Object' and $given->($set) and return blessed $set;
-        $display_name eq 'Str' and return $given->($set);
+        $given->($set);
+        $display_name eq 'Object' and return blessed $set;
+        return $set;
     }
     elsif ( $ref_given eq 'CODE' ) {
-        return $given->( $self, $set );
+        my $val = $given->( $self, $set );
+        return $val;
     }
 
     return $set;

@@ -44,16 +44,16 @@ variant string => (
 );
 
 variant refs => (
-    given => sub { shift; ref $_[1] or ref \@_ }, 
+    given => sub { ref $_[1] or ref \$_[1] }, 
     when => {
         'SCALAR' => { 
-            run => sub { return "Ref returned - SCALAR - $_[1]" },
+            run => sub { return sprintf "refs returned - SCALAR - %s", $_[1] },
         },
         'HASH' => {
-            run => sub { return "Ref returned - HASH -" . join ',', map { sprintf '%s=>%s', $_, $_[1]->{$_} } keys %{ $_[1] }; },
+            run => sub { return "refs returned - HASH - " . join ',', map { sprintf '%s=>%s', $_, $_[1]->{$_} } keys %{ $_[1] }; },
         },
         'ARRAY' => {
-            run => sub { return "Ref returned - ARRAY - " . join ',', @{ $_[1] } },
+            run => sub { return "refs returned - ARRAY - " . join ',', @{ $_[1] } },
         },
     },
 );
