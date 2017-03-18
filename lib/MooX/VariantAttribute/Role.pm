@@ -14,14 +14,11 @@ sub _given_when {
     my ($self) = shift;
     my ( $set, $given, $when, $attr ) = @_;
 
-    return undef if $self->variant_last_value->{$attr}
-        and ref \$set eq 'SCALAR' 
-            and $self->variant_last_value->{$attr}->{set} =~ m/^$set$/;
+    return if $self->_variant_last_value($attr, 'set', $set);
 
     my $find = $self->_find_from_given(@_);
 
-    return undef if $self->variant_last_value->{$attr}
-        and $self->variant_last_value->{$attr}->{find} =~ m/^$find$/;
+    return if $self->_variant_last_value($attr, 'find', $find);
     
     $self->variant_last_value->{$attr}->{find} = $find;
     
@@ -46,6 +43,16 @@ sub _given_when {
 
     croak sprintf 'Could not find - %s - in when spec for attribute - %s',
       $set, $attr;
+}
+
+sub _variant_last_value {
+    my ($self, $attr, $value, $set) = @_;
+
+    # TODO
+    return undef unless ref \$set eq 'SCALAR';
+    return undef unless $self->variant_last_value->{$attr};
+    return 1 if $self->variant_last_value->{$attr}->{$value} =~ m/^$set$/;
+    return undef; 
 }
 
 sub _find_from_given {
