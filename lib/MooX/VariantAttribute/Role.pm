@@ -1,7 +1,6 @@
 package MooX::VariantAttribute::Role;
 
 use Moo::Role;
-use Scalar::Util qw/blessed/;
 use Carp qw/croak/;
 
 has variant_last_value => (
@@ -81,8 +80,8 @@ sub _find_from_given {
     my $ref_given = ref $given;
     if ( $ref_given eq 'Type::Tiny' ) {
         my $display_name = $given->display_name;
-        $given->($set);
-        $display_name eq 'Object' and return blessed $set;
+        $set = $given->($set);
+        $display_name eq 'Object' and return ref $set;
         return $set;
     }
     elsif ( $ref_given eq 'CODE' ) {

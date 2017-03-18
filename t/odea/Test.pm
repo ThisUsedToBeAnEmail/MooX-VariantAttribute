@@ -6,7 +6,7 @@ use Types::Standard qw/Object Str/;
 
 variant parser => (
     given => Object,
-    when => {
+    when => [
         'Test::Parser::One' => {
             alias => {
                 parse_string => 'parse',
@@ -25,12 +25,12 @@ variant parser => (
                 parse_file   => 'meth_two', 
             },
         },
-    },
+    ],
 );
 
 variant string => (
     given => Str,
-    when => {
+    when => [
         'one' => { 
             run => sub { return "$_[1] - cold, cold, cold inside" },
         },
@@ -40,12 +40,12 @@ variant string => (
         'three' => {
             run => sub { return "$_[1] - how hard will i fall if I live a double life"; },
         },
-    },
+    ],
 );
 
 variant refs => (
     given => sub { ref $_[1] or ref \$_[1] }, 
-    when => {
+    when => [
         'SCALAR' => { 
             run => sub { return sprintf "refs returned - SCALAR - %s", $_[1] },
         },
@@ -55,7 +55,7 @@ variant refs => (
         'ARRAY' => {
             run => sub { return "refs returned - ARRAY - " . join ',', @{ $_[1] } },
         },
-    },
+    ],
 );
 
 =pod
