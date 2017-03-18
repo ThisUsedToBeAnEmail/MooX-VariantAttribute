@@ -67,4 +67,23 @@ my $parser = Random::Parser::Two->new();
 my $parsers = $obj->_find_from_given($parser, Object, $when2);
 is( $parsers, 'Random::Parser::Two', 'alias' );
 
+my $when3 = {    
+    'SCALAR' => {
+        run => sub { return 'I am a SCALAR' },
+    },
+    'HASH' => {
+        run => sub { return 'I am a HASH' },
+    },
+    'ARRAY' => {
+        run => sub { return 'I am a ARRAY' },
+    },
+};
+
+my $scalar = $obj->_find_from_given('HEY', sub { ref $_[0] or ref \$_[0] }, $when3);
+is( $scalar, 'SCALAR', 'ref SCALAR' );
+my $hash = $obj->_find_from_given({ one => 'two' }, sub { ref $_[0] }, $when3);
+is( $hash, 'HASH', 'ref HASH' );
+my $array = $obj->_find_from_given([qw/one two/], sub { ref $_[0] }, $when3);
+is( $array, 'ARRAY', 'ref ARRAY' );
+
 done_testing();

@@ -30,13 +30,16 @@ sub _given_when {
 sub _find_from_given {
     my ( $self, $set, $given, $when ) = @_;
 
-    if ( ref $given eq 'Type::Tiny' ) {
+    my $ref_given = ref $given;
+    if ( $ref_given eq 'Type::Tiny' ) {
         my $display_name = $given->display_name;
-        $display_name eq 'Object' and return blessed $set;
-        $display_name eq 'Str' and return $set; 
+        $display_name eq 'Object' and $given->($set) and return blessed $set;
+        $display_name eq 'Str' and return $given->($set); 
+    } elsif ( $ref_given eq 'CODE' ) {
+        $set = $given->($set);
     }
+
     return $set;
 }
-
 
 1;
