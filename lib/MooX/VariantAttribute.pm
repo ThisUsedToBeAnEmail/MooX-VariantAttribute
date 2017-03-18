@@ -32,25 +32,13 @@ sub import {
 sub _construct_attribute {
     my ($name, %spec) = @_;
 
-    my $tigger = sub {
-        my ($self, $value) = @_;
-
-        my $hacks = blessed $value // $value;
-        if ($self->variant_last_value->{$name} and $self->variant_last_value->{$name} =~ m/^$hacks$/) {
-            return;
-        }
-
-        my $new_val = $self->_given_when($value, $spec{given}, $spec{when}, $name);
-
-        $hacks = blessed $new_val // $value;
-        $self->variant_last_value->{$name} = $hacks;
-
-        return $self->$name($new_val);
+    my $trigger = sub {
+        return $_[0]->_given_when($_[1], $spec{given}, $spec{when}, $name);
     };
 
     return (
         is => $spec{is} ? $spec{is} : 'rw',
-        trigger => $tigger,
+        trigger => $trigger,
     );
 }
 

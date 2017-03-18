@@ -24,9 +24,9 @@ my $when = {
     },
 };
 
-is $obj->_find_from_given('one', Str, $when), 'one', 'okay we have one';
-is $obj->_find_from_given('two', Str, $when), 'two', 'okay we have two';
-is $obj->_find_from_given('three', Str, $when), 'three', 'okay we have three';
+is $obj->_find_from_given('one', Str, $when, 'test'), 'one', 'okay we have one';
+is $obj->_find_from_given('two', Str, $when, 'test'), 'two', 'okay we have two';
+is $obj->_find_from_given('three', Str, $when, 'test'), 'three', 'okay we have three';
 
 {
     package Random::Parser::Two;
@@ -79,11 +79,11 @@ my $when3 = {
     },
 };
 
-my $scalar = $obj->_find_from_given('HEY', sub { ref $_[1] or ref \$_[1] }, $when3);
+my $scalar = $obj->_find_from_given('HEY', sub { ref $_[1] or ref \$_[1] }, $when3, 'test');
 is( $scalar, 'SCALAR', 'ref SCALAR' );
-my $hash = $obj->_find_from_given({ one => 'two' }, sub { ref $_[1] }, $when3);
+my $hash = $obj->_find_from_given({ one => 'two' }, sub { ref $_[1] }, $when3, 'test');
 is( $hash, 'HASH', 'ref HASH' );
-my $array = $obj->_find_from_given([qw/one two/], sub { ref $_[1] }, $when3);
+my $array = $obj->_find_from_given([qw/one two/], sub { ref $_[1] }, $when3, 'test');
 is( $array, 'ARRAY', 'ref ARRAY' );
 
 done_testing();

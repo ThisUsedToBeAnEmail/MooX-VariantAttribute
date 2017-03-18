@@ -24,9 +24,9 @@ my $when = {
     },
 };
 
-is $obj->_given_when('one', Str, $when), 'one - cold, cold, cold inside', 'okay we have one';
-is $obj->_given_when('two', Str, $when), 'two - don\'t look at me that way', 'okay we have two';
-is $obj->_given_when('three', Str, $when), 'three - how hard will i fall if I live a double life', 'okay we have three';
+is $obj->_given_when('one', Str, $when, 'test'), 'one - cold, cold, cold inside', 'okay we have one';
+is $obj->_given_when('two', Str, $when, 'test'), 'two - don\'t look at me that way', 'okay we have two';
+is $obj->_given_when('three', Str, $when, 'test'), 'three - how hard will i fall if I live a double life', 'okay we have three';
 
 {
     package Random::Parser::Two;
@@ -64,7 +64,7 @@ my $when2 = {
 };
 
 my $parser = Random::Parser::Two->new();
-my $parser = $obj->_given_when($parser, Object, $when2);
+my $parser = $obj->_given_when($parser, Object, $when2, 'test');
 is( $parser->parse_file, 'parse file', 'alias' );
 
 my $when3 = {    
@@ -79,11 +79,11 @@ my $when3 = {
     },
 };
 
-my $scalar = $obj->_given_when('HEY', sub { ref $_[1] or ref \$_[1] }, $when3);
+my $scalar = $obj->_given_when('HEY', sub { ref $_[1] or ref \$_[1] }, $when3, 'test');
 is( $scalar, 'I am a SCALAR', 'ref SCALAR' );
-my $hash = $obj->_given_when({ one => 'two' }, sub { ref $_[1] }, $when3);
+my $hash = $obj->_given_when({ one => 'two' }, sub { ref $_[1] }, $when3, 'test');
 is( $hash, 'I am a HASH', 'ref HASH' );
-my $array = $obj->_given_when([qw/one two/], sub { ref $_[1] }, $when3);
+my $array = $obj->_given_when([qw/one two/], sub { ref $_[1] }, $when3, 'test');
 is( $array, 'I am a ARRAY', 'ref ARRAY' );
 
 done_testing();
