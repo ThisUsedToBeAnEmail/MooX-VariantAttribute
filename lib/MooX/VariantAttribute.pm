@@ -18,8 +18,7 @@ sub import {
 
     };
 
-
-    { no strict 'refs'; *{"${target}::variant"} = $variant; }
+    { no strict 'refs'; *{"${target}::variant"} = $variant;}
 
     return 1;
 }

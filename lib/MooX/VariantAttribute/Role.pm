@@ -3,11 +3,12 @@ package MooX::VariantAttribute::Role;
 use Moo::Role;
 use Scalar::Util qw/blessed/;
 
-sub _when_variant {
-	my ($self, $set, $given, $when) = @_;
-
-    my $find = $given->display_name eq 'Object' ? blessed $set : $set;
+sub _given_when {
+	my ($self) = shift;
+    my ($set, $given, $when) = @_;
     
+    my $find = $self->_find_from_given(@_);
+
     if ( my $found = $when->{$find} ) {
 		if ( $found->{alias} ) {
 			for my $alias (keys %{$found->{alias}}) {
@@ -19,11 +20,23 @@ sub _when_variant {
 				}
 			}
 		}
-	
+        	
     	$found->{run} and $set = $found->{run}->($self, $set);
 	}        
 
     return $set;
 }
+
+sub _find_from_given {
+    my ( $self, $set, $given, $when ) = @_;
+
+    if ( ref $given eq 'Type::Tiny' ) {
+        my $display_name = $given->display_name;
+        $display_name eq 'Object' and return blessed $set;
+        $display_name eq 'Str' and return $set; 
+    }
+    return $set;
+}
+
 
 1;

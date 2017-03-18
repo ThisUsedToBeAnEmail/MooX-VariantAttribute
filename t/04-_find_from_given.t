@@ -24,9 +24,9 @@ my $when = {
     },
 };
 
-is $obj->_given_when('one', Str, $when), 'one - cold, cold, cold inside', 'okay we have one';
-is $obj->_given_when('two', Str, $when), 'two - don\'t look at me that way', 'okay we have two';
-is $obj->_given_when('three', Str, $when), 'three - how hard will i fall if I live a double life', 'okay we have three';
+is $obj->_find_from_given('one', Str, $when), 'one', 'okay we have one';
+is $obj->_find_from_given('two', Str, $when), 'two', 'okay we have two';
+is $obj->_find_from_given('three', Str, $when), 'three', 'okay we have three';
 
 {
     package Random::Parser::Two;
@@ -64,7 +64,7 @@ my $when2 = {
 };
 
 my $parser = Random::Parser::Two->new();
-my $parser = $obj->_given_when($parser, Object, $when2);
-is( $parser->parse_file, 'parse file', 'alias' );
+my $parsers = $obj->_find_from_given($parser, Object, $when2);
+is( $parsers, 'Random::Parser::Two', 'alias' );
 
 done_testing();
