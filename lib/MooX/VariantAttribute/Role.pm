@@ -48,7 +48,6 @@ sub _given_when {
 sub _variant_last_value {
     my ($self, $attr, $value, $set) = @_;
 
-    # TODO
     return undef unless ref \$set eq 'SCALAR';
     return undef unless $self->variant_last_value->{$attr};
     return 1 if $self->variant_last_value->{$attr}->{$value} =~ m/^$set$/;
