@@ -32,13 +32,13 @@ variant string => (
     given => Str,
     when => [
         'one' => { 
-            run => sub { return "$_[1] - cold, cold, cold inside" },
+            run => sub { return "$_[2] - cold, cold, cold inside" },
         },
         'two' => {
-            run => sub { return "$_[1] - don't look at me that way"; },
+            run => sub { return "$_[2] - don't look at me that way"; },
         },
         'three' => {
-            run => sub { return "$_[1] - how hard will i fall if I live a double life"; },
+            run => sub { return "$_[2] - how hard will i fall if I live a double life"; },
         },
     ],
 );
@@ -47,13 +47,13 @@ variant refs => (
     given => sub { ref $_[1] or ref \$_[1] }, 
     when => [
         'SCALAR' => { 
-            run => sub { return sprintf "refs returned - %s - %s", $_[2], $_[1] },
+            run => sub { return sprintf "refs returned - %s - %s", $_[1], $_[2] },
         },
         'HASH' => {
-            run => sub { return sprintf "refs returned - %s - %s", $_[2], (join(',', map { sprintf '%s=>%s', $_, $_[1]->{$_} } keys %{ $_[1] })); },
+            run => sub { return sprintf "refs returned - %s - %s", $_[1], (join(',', map { sprintf '%s=>%s', $_, $_[2]->{$_} } keys %{ $_[2] })); },
         },
         'ARRAY' => {
-            run => sub { return sprintf "refs returned - %s - %s", $_[2], join(',', @{ $_[1] }) },
+            run => sub { return sprintf "refs returned - %s - %s", $_[1], join(',', @{ $_[2] }) },
         },
     ],
 );
