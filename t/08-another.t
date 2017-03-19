@@ -81,4 +81,92 @@ is $object->hello, 'one';
 my $object2 = Backwards::World::Goodbye->new( goodbye => { one => 'two' } );
 is_deeply $object2->goodbye, { one => 'two', three => 'two' };
 
+{
+    package Backwards::World::Default;
+    use Moo;
+    use MooX::VariantAttribute;
+    use Types::Standard qw/Any/;
+
+    variant hello => (
+        given => Any,
+        when => [
+            { one => 'two' } => {
+                run => sub { return keys %{ $_[2] } },
+            },
+            { three => 'four' } => {
+                run => sub { return values %{ $_[2] } },
+            },
+            [ qw/five six/ ] => {
+                run => sub { return $_[2]->[1] },
+            },
+            seven => {
+                run => sub { return $_[0]->hello({ one => 'two' }) },
+            }
+        ],
+        default => 'seven',
+    );
+}
+
+my $object3 = Backwards::World::Default->new();
+is $object3->hello, 'one';
+
+{
+    package Backwards::World::DefaultHash;
+    use Moo;
+    use MooX::VariantAttribute;
+    use Types::Standard qw/Any/;
+
+    variant hello => (
+        given => Any,
+        when => [
+            { one => 'two' } => {
+                run => sub { return keys %{ $_[2] } },
+            },
+            { three => 'four' } => {
+                run => sub { return values %{ $_[2] } },
+            },
+            [ qw/five six/ ] => {
+                run => sub { return $_[2]->[1] },
+            },
+            seven => {
+                run => sub { return $_[0]->hello({ one => 'two' }) },
+            }
+        ],
+        default => { three => 'four' },
+    );
+}
+
+my $object4 = Backwards::World::DefaultHash->new();
+is $object4->hello, 'four';
+
+{
+    package Backwards::World::DefaultHashSub;
+    use Moo;
+    use MooX::VariantAttribute;
+    use Types::Standard qw/Any/;
+
+    variant hello => (
+        given => Any,
+        when => [
+            { one => 'two' } => {
+                run => sub { return keys %{ $_[2] } },
+            },
+            { three => 'four' } => {
+                run => sub { return values %{ $_[2] } },
+            },
+            [ qw/five six/ ] => {
+                run => sub { return $_[2]->[1] },
+            },
+            seven => {
+                run => sub { return $_[0]->hello({ one => 'two' }) },
+            }
+        ],
+        default => sub { { three => 'four' } },
+    );
+}
+
+my $object5 = Backwards::World::DefaultHashSub->new();
+is $object5->hello, 'four';
+
+
 done_testing();

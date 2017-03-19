@@ -9,36 +9,51 @@ our $VERSION = '0.04';
 
 sub import {
     my ( $package, @import ) = @_;
-    
+
     my $target = caller;
-    my %modifiers = return_modifiers($target, [qw/has around with/]);
+    my %modifiers = return_modifiers( $target, [qw/has around with/] );
 
     my $variant = sub {
-        my ($name, %spec) = @_;
-       
-        $modifiers{has}->(
-            $name => _construct_attribute($name, %spec)
-        );
+        my ( $name, %spec ) = @_;
+
+        $modifiers{has}->( $name => _construct_attribute( $name, %spec ) );
 
     };
 
-    $target->can('_given_when') or $modifiers{with}->( 'MooX::VariantAttribute::Role' );
+    $target->can('_given_when')
+      or $modifiers{with}->('MooX::VariantAttribute::Role');
 
-    { no strict 'refs'; *{"${target}::variant"} = $variant;}
+    { no strict 'refs'; *{"${target}::variant"} = $variant; }
 
     return 1;
 }
 
 sub _construct_attribute {
-    my ($name, %spec) = @_;
+    my ( $name, %spec ) = @_;
 
     my $trigger = sub {
-        return $_[0]->_given_when($_[1], $spec{given}, $spec{when}, $name);
+        return $_[0]->_given_when( $_[1], $spec{given}, $spec{when}, $name );
     };
 
     return (
-        is => 'rw',
+        is      => 'rw',
         trigger => $trigger,
+        (
+            $spec{default} ? (
+                default => sub {
+                    return $_[0]->_given_when(
+                        (
+                            ref $spec{default} eq 'CODE'
+                                ? $spec{default}->()
+                                : $spec{default}
+                        ),
+                        $spec{given},
+                        $spec{when},
+                        $name
+                    );
+                }
+            ) : ()
+        ),
     );
 }
 
