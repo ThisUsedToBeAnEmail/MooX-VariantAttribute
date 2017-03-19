@@ -2,7 +2,7 @@ package MooX::VariantAttribute::Role;
 
 use Moo::Role;
 use Carp qw/croak/;
-use Scalar::Util qw/blessed refaddr/;
+use Scalar::Util qw/blessed refaddr reftype/;
 
 has variant_last_value => (
     is      => 'rw',
@@ -17,9 +17,7 @@ sub _given_when {
     return if $self->_variant_last_value($attr, 'set', $set);
 
     my $find = $self->_find_from_given(@_);
-
-    return if $self->_variant_last_value($attr, 'find', $find);
-    
+   
     $self->variant_last_value->{$attr}->{find} = $find;
     
     my @when = @{ $when };
@@ -54,14 +52,24 @@ sub _variant_last_value {
     my ($self, $attr, $value, $set) = @_;
 
     return undef unless $self->variant_last_value->{$attr};
-    return _struct_the_same($self->variant_last_value->{$attr}->{$value}, $set);
+    return _passed_the_same($self->variant_last_value->{$attr}->{$value}, $set);
+}
+
+sub _passed_the_same {
+    my ($stored, $passed) = @_;
+
+    if ( ref $passed and ref $stored ) {
+        return refaddr($stored) == refaddr($passed) ? 1 : undef;
+    } 
+    
+    return ($stored =~ m/^$passed$/) ? 1 : undef;
 }
 
 sub _struct_the_same {
     my ($stored, $passed) = @_;
     
-    my $stored_ref = ref($stored) || ref(\$stored);
-    my $passed_ref = ref($passed) || ref(\$passed);
+    my $stored_ref = reftype($stored) || reftype(\$stored);
+    my $passed_ref = reftype($passed) || reftype(\$passed);
     $stored_ref eq $passed_ref or return undef;
      
     if ( $stored_ref eq 'SCALAR') {
@@ -77,8 +85,6 @@ sub _struct_the_same {
             _struct_the_same($stored->[$_], $passed->[$_]) or return undef;
         }
         return 1;
-    } elsif (blessed $passed) {
-        return refaddr($stored) == refaddr($passed) ? 1 : undef;
     }
 
     return 1;

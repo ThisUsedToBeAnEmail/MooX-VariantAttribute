@@ -36,6 +36,9 @@ is (&One::Two::Three::_struct_the_same($obj1, $obj1), 1, 'the same object ref');
 
 my $obj2 = One::Two::Three::Four->new( single => 'Hey' );
 
-is (&One::Two::Three::_struct_the_same($obj1, $obj2), undef, 'not the same object ref');
+is (&One::Two::Three::_struct_the_same($obj1, $obj2), 1, 'the same object ref');
 
+my $obj3 = One::Two::Three::Four->new( single => 'Heya' );
+
+is (&One::Two::Three::_struct_the_same($obj1, $obj3), undef, 'not the same object ref');
 done_testing();
