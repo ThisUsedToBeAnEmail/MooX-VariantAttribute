@@ -36,7 +36,7 @@ sub _given_when {
                 }
             }
 
-            $found->{run} and $set = $found->{run}->( $self, $set, $found );
+            $found->{run} and $set = $found->{run}->( $self, $set, $find );
 
             $self->variant_last_value->{$attr}->{set} = $set;
 
