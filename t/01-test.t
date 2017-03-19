@@ -233,4 +233,4 @@ moon_test(
     ],
 );
 
-sunrise();
+sunrise(35, strut);

@@ -58,14 +58,13 @@ Version 0.03
 
 =head1 SYNOPSIS
 
-    package My::Multi::Parser
+    package Backwards::World;
     use Moo;
     use MooX::VariantAttribute;
-    use Type::Standards qw/Obj/;
+    use Type::Standards qw/Object Str/;
 
-    # variant accepts everything - has - does
     variant parser => (
-        given => Obj,
+        given => Object,
         when => [
             'Test::Parser::One' => {
                 alias => {
@@ -88,32 +87,47 @@ Version 0.03
         ],
     );
 
+    variant string => (
+        given => Str,
+        when => [
+            'one' => { 
+                run => sub { return "$_[2] - cold, cold, cold inside" },
+            },
+            'two' => {
+                run => sub { return "$_[2] - don't look at me that way"; },
+            },
+            'three' => {
+                run => sub { return "$_[2] - how hard will i fall if I live a double life"; },
+            },
+        ],
+    );
+
     variant refs => (
         given => sub { ref $_[1] or ref \$_[1] }, 
         when => [
             'SCALAR' => { 
-                run => sub { return "refs returned - SCALAR - $_[1]" },
+                run => sub { 
+                    return sprintf "refs returned - %s - %s", $_[1], $_[2]; 
+                },
             },
             'HASH' => {
                 run => sub { 
-                    return "refs returned - HASH - " . 
-                        join ',', map { sprintf '%s=>%s', $_, $_[1]->{$_} } keys %{ $_[1] }; 
+                    return sprintf "refs returned - %s - %s", 
+                        $_[1], (join(',', map { sprintf '%s=>%s', $_, $_[2]->{$_} } keys %{ $_[2] })); 
                 },
             },
             'ARRAY' => {
                 run => sub { 
-                    return "refs returned - ARRAY - " . join ',', @{ $_[1] } 
+                    return sprintf "refs returned - %s - %s", $_[1], join(',', @{ $_[2] }) 
                 },
             },
         ],
     );
 
-    ........
+=head1 Description
 
-    my $parser = My::Multi::Parser->new( parser => Another::Parser::Three->new() )->parser;
-    $parser->parse_string();
-    $parser->parse_file();
 
+=head2 variant
 
 =head1 AUTHOR
 

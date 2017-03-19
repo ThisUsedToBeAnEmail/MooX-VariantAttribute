@@ -70,8 +70,8 @@ sub _ref_the_same {
 sub _struct_the_same {
     my ($stored, $passed) = @_;
     
-    my $stored_ref = reftype($stored) || reftype(\$stored);
-    my $passed_ref = reftype($passed) || reftype(\$passed);
+    my $stored_ref = reftype($stored) // reftype(\$stored);
+    my $passed_ref = reftype($passed) // reftype(\$passed);
     $stored_ref eq $passed_ref or return undef;
      
     if ( $stored_ref eq 'SCALAR') {
