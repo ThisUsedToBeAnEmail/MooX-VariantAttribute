@@ -2,6 +2,7 @@ package MooX::VariantAttribute::Role;
 
 use Moo::Role;
 use Carp qw/croak/;
+use Scalar::Util qw/blessed refaddr/;
 
 has variant_last_value => (
     is      => 'rw',
@@ -76,7 +77,10 @@ sub _struct_the_same {
             _struct_the_same($stored->[$_], $passed->[$_]) or return undef;
         }
         return 1;
-    } 
+    } elsif (blessed $passed) {
+        return refaddr($stored) == refaddr($passed) ? 1 : undef;
+    }
+
     return 1;
 }
 
