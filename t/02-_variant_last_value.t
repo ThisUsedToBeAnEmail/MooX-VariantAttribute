@@ -1,7 +1,7 @@
 use Test::More;
 
 {
-    package One::Two::Three;
+    package One::Two;
 
     use Moo;
     with 'MooX::VariantAttribute::Role';
@@ -23,7 +23,7 @@ use Test::More;
 
 }
 
-my $obj = One::Two::Three->new;
+my $obj = One::Two->new;
 
 is $obj->_variant_last_value('refs', 'find', 'ARRAY'), 1, "YES we can find ARRAY";
 is $obj->_variant_last_value('refs', 'set', 'refs returned - ARRAY - one,two'), 1, "YES we can find ARRAY";

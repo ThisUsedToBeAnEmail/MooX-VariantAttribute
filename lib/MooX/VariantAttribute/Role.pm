@@ -52,10 +52,10 @@ sub _variant_last_value {
     my ($self, $attr, $value, $set) = @_;
 
     return undef unless $self->variant_last_value->{$attr};
-    return _passed_the_same($self->variant_last_value->{$attr}->{$value}, $set);
+    return _ref_the_same($self->variant_last_value->{$attr}->{$value}, $set);
 }
 
-sub _passed_the_same {
+sub _ref_the_same {
     my ($stored, $passed) = @_;
 
     if ( ref $passed and ref $stored ) {
