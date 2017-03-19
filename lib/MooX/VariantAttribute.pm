@@ -5,7 +5,7 @@ use warnings;
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
 use MooX::ReturnModifiers;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub import {
     my ( $package, @import ) = @_;
@@ -52,7 +52,7 @@ MooX::VariantAttribute - a щ（ﾟДﾟщ）Attribute...
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -126,8 +126,91 @@ Version 0.03
 
 =head1 Description
 
+"I'm just a attribute with a trigger", when you...
+
+    use MooX::VariantAttribute;
+
+Magically a role is added..
+
+    with 'MooX::VariantAttribute::Role';
+
+L<MooX::VariantAttribute::Role> is a L<Moo::Role> that contains the variant attributes *trigger* logic.
 
 =head2 variant
+
+Multiple variant attributes can be declared, they are read in as a list. Each will be transformed into a Moo Attribute
+with a trigger. 
+
+    variant 'one' => (
+        given => Str,
+        when => [
+            one => { run => sub { return 'one' } },
+        ],
+    );
+        
+    .....
+
+    has one => (
+        is => 'rw',
+        trigger => sub {
+            return $_[0]->_given_when($_[1], $spec{given}, $spec{when}, $name);
+        }
+    );
+
+By default variants are read-write, You can optionally set a variant to be read-only the normal way.
+
+    variant 'one' => (
+        is => 'ro',
+        ...
+    )
+
+    my $foo = Backwards::World->new( one => 'world' );
+
+Variants should always have two key/value pairs, given and when, given accepts a code reference or L<Type::Tiny> object. When the code 
+reference is called two parameters are passed the first $self the second the $new value. Type::Tiny objects are called with 
+the $new value.
+    
+    given => sub { my $self = shift; ref $_[1] },
+
+When is well when it gets more complicated. *when* should always be an array reference of pairs. The first value is the *matching* value
+it can be a SCALAR, ARRAY, HASH maybe even a Object. The second value has to be a hash reference with two optional keys run and alias. 
+run should always be a code reference it will be passed $self, the $value returned from given, and the $new value. 
+
+    package Backwards::World;
+    use Moo;
+    use MooX::VariantAttribute;
+    use Types::Standard qw/Any/;
+
+    variant hello => (
+        given => Any,
+        when => [
+            { one => 'two' } => {
+                run => sub { return keys %{ $_[2] } },
+            },
+            { three => 'four' } => {
+                run => sub { return values %{ $_[2] } },
+            },
+            [ qw/five six/ ] => {
+                run => sub { return $_[2]->[1] },
+            },
+            seven => {
+                run => sub { return $_[0]->hello({ one => 'two' }) },
+            }
+        ],
+    );
+
+    $object = Backwards::World->new( hello => 'one' );
+
+    $object->hello # one;
+
+    $object->hello({ three => 'four' }); # four;
+    $object->hello, # four;
+
+    $object->hello([ qw/five six/ ]), # six;
+    $object->hello, # six;
+
+    $object->hello('seven'), # one;
+    $object->hello, # one;
 
 =head1 AUTHOR
 

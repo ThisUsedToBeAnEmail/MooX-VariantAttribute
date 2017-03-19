@@ -12,6 +12,9 @@ t/02-_variant_last_value.t
 t/03-when.t
 t/04-_find_from_given.t
 t/05-_runs.t
+t/06-_struct_the_same.t
+t/07-_ref_the_same.t
+t/08-another.t
 t/manifest.t
 t/odea/Test.pm
 t/pod-coverage.t

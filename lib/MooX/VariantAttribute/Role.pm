@@ -2,7 +2,7 @@ package MooX::VariantAttribute::Role;
 
 use Moo::Role;
 use Carp qw/croak/;
-use Scalar::Util qw/refaddr reftype/;
+use Scalar::Util qw/blessed refaddr reftype/;
 
 has variant_last_value => (
     is      => 'rw',
@@ -21,18 +21,22 @@ sub _given_when {
     $self->variant_last_value->{$attr}->{find} = $find;
     
     my @when = @{ $when };
-    while (@when) {
+    while (scalar @when >= 2) {
         my $check = shift @when;
         my $found = shift @when;
         if ( _struct_the_same($check, $find) ) {
             if ( $found->{alias} ) {
-                for my $alias ( keys %{ $found->{alias} } ) {
-                    next if $set->can($alias);
-                    my $actual = $found->{alias}->{$alias};
-                    {
-                        no strict 'refs';
-                        *{"${find}::${alias}"} = sub { goto &{"${find}::${actual}"} };
+                if (blessed $set) {
+                    for my $alias ( keys %{ $found->{alias} } ) {
+                        next if $set->can($alias);
+                        my $actual = $found->{alias}->{$alias};
+                        {
+                            no strict 'refs';
+                            *{"${find}::${alias}"} = sub { goto &{"${find}::${actual}"} };
+                        }
                     }
+                } else {
+                    map { $set->{$_} = $set->{$found->{alias}->{$_}} } keys %{ $found->{alias} };
                 }
             }
 
