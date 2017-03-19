@@ -16,6 +16,14 @@ sub import {
     my $variant = sub {
         my ( $name, %spec ) = @_;
 
+        if ( my $builder = $spec{builder} ) {
+            my $build_name = $builder =~ m/^1$/ ? sprintf "_build_%s", $name : $builder;
+            $modifiers{around}->($build_name, sub { 
+                my ($orig, $self) = (shift, shift);
+                return $self->_given_when($self->$orig(@_), $spec{given}, $spec{when}, $name);
+            });
+        }
+
         $modifiers{has}->( $name => _construct_attribute( $name, %spec ) );
 
     };
@@ -54,6 +62,9 @@ sub _construct_attribute {
                 }
             ) : ()
         ),
+        (map {(
+            $spec{$_} ? ( $_ => $spec{$_} ) : ()
+        )} qw/builder lazy predicate clearer required reader writer/),
     );
 }
 
@@ -172,14 +183,16 @@ with a trigger.
         }
     );
 
-Variants should always have two key/value pairs, given and when, given accepts a code reference or L<Type::Tiny> object. When the code 
+These attributes have to be read-write as the trigger is used to set the final *stored* value.
+
+The Variants should always have two key/value pairs, given and when, given accepts a code reference or L<Type::Tiny> object. When the code 
 reference is called two parameters are passed the first $self the second the $new value. Type::Tiny objects are called with 
 the $new value.
     
     given => sub { my $self = shift; ref $_[1] },
 
 When is well when it gets more complicated. *when* should always be an array reference of pairs. The first value is the *matching* value
-it can be a SCALAR, ARRAY, HASH maybe even a Object. The second value has to be a hash reference with two optional keys run and alias. 
+it can be a SCALAR, ARRAY, HASH maybe even an Object. The second value has to be a hash reference with two optional keys run and alias. 
 run should always be a code reference it will be passed $self, the $value returned from given, and the $new value. 
 
     package Backwards::World;
@@ -205,7 +218,9 @@ run should always be a code reference it will be passed $self, the $value return
         ],
     );
 
-    $object = Backwards::World->new( hello => 'one' );
+    ....
+    
+    my $object = Backwards::World->new( hello => 'one' );
 
     $object->hello # one;
 
@@ -217,6 +232,13 @@ run should always be a code reference it will be passed $self, the $value return
 
     $object->hello('seven'), # one;
     $object->hello, # one;
+
+You can also set the default value for a variant attribute using a *default* or a *builder*.
+
+    default => sub { one => two },
+    default => { one => two }, 
+
+    builder => 1,
 
 =head1 AUTHOR
 
@@ -257,9 +279,7 @@ L<http://search.cpan.org/dist/MooX-VariantAttribute/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -300,7 +320,6 @@ YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
 CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 =cut
 

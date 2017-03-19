@@ -169,4 +169,74 @@ my $object5 = Backwards::World::DefaultHashSub->new();
 is $object5->hello, 'four';
 
 
+{
+    package Backwards::World::Builder;
+    use Moo;
+    use MooX::VariantAttribute;
+    use Types::Standard qw/Any/;
+
+    variant hello => (
+        given => Any,
+        when => [
+            { one => 'two' } => {
+                run => sub { return keys %{ $_[2] } },
+            },
+            { three => 'four' } => {
+                run => sub { return values %{ $_[2] } },
+            },
+            [ qw/five six/ ] => {
+                run => sub { return $_[2]->[1] },
+            },
+            seven => {
+                run => sub { return $_[0]->hello({ one => 'two' }) },
+            }
+        ],
+        builder => 1,
+    );
+
+    sub _build_hello {
+        return { one => 'two' };
+    }
+}
+
+my $object5 = Backwards::World::Builder->new();
+is $object5->hello, 'one';
+
+{
+    package Backwards::World::Lazy;
+    use Moo;
+    use MooX::VariantAttribute;
+    use Types::Standard qw/Any/;
+
+    variant hello => (
+        given => Any,
+        when => [
+            { one => 'two' } => {
+                run => sub { return keys %{ $_[2] } },
+            },
+            { three => 'four' } => {
+                run => sub { return values %{ $_[2] } },
+            },
+            [ qw/five six/ ] => {
+                run => sub { return $_[2]->[1] },
+            },
+            seven => {
+                run => sub { return $_[0]->hello({ one => 'two' }) },
+            }
+        ],
+        builder => 1,
+        lazy => 1,
+    );
+
+    sub _build_hello {
+        return { one => 'two' };
+    }
+}
+
+my $object5 = Backwards::World::Lazy->new();
+is $object5->hello, 'one';
+
+
+
+
 done_testing();
