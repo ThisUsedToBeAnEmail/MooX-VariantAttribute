@@ -37,7 +37,7 @@ sub _construct_attribute {
     };
 
     return (
-        is => $spec{is} ? $spec{is} : 'rw',
+        is => 'rw',
         trigger => $trigger,
     );
 }
@@ -156,15 +156,6 @@ with a trigger.
             return $_[0]->_given_when($_[1], $spec{given}, $spec{when}, $name);
         }
     );
-
-By default variants are read-write, You can optionally set a variant to be read-only the normal way.
-
-    variant 'one' => (
-        is => 'ro',
-        ...
-    )
-
-    my $foo = Backwards::World->new( one => 'world' );
 
 Variants should always have two key/value pairs, given and when, given accepts a code reference or L<Type::Tiny> object. When the code 
 reference is called two parameters are passed the first $self the second the $new value. Type::Tiny objects are called with 

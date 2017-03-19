@@ -20,7 +20,6 @@ ok($attribute->refs($attribute->string));
 
 is $attribute->refs, 'refs returned - SCALAR - three - how hard will i fall if I live a double life';
 
-
 {
     package Backwards::World;
     use Moo;
@@ -58,6 +57,25 @@ is $object->hello([ qw/five six/ ]), 'six';
 is $object->hello, 'six';
 
 is $object->hello('seven'), 'one';
+is $object->hello, 'one';
+
+{
+    package Backwards::World::ro;
+    use Moo;
+    use MooX::VariantAttribute;
+    use Types::Standard qw/Any/;
+
+    variant hello => (
+        given => Any,
+        when => [
+            { one => 'two' } => {
+                run => sub { return keys %{ $_[2] } },
+            },
+        ],
+    );
+}
+
+my $object2 = Backwards::World::ro->new( hello => { one => 'two' } );
 is $object->hello, 'one';
 
 done_testing();

@@ -107,15 +107,6 @@ with a trigger.
         }
     );
 
-By default variants are read-write, You can optionally set a variant to be read-only the normal way.
-
-    variant 'one' => (
-        is => 'ro',
-        ...
-    )
-
-    my $foo = Backwards::World->new( one => 'world' );
-
 Variants should always have two key/value pairs, given and when, given accepts a code reference or [Type::Tiny](https://metacpan.org/pod/Type::Tiny) object. When the code 
 reference is called two parameters are passed the first $self the second the $new value. Type::Tiny objects are called with 
 the $new value.
