@@ -25,6 +25,11 @@ sub _given_when {
         my $check = shift @when;
         my $found = shift @when;
         if ( _struct_the_same($check, $find) ) {
+            if ( $found->{run} ) { 
+                my @new = $found->{run}->( $self, $find, $set, );
+                $set = scalar @new > 1 ? \@new : shift @new;
+            }
+
             if ( $found->{alias} ) {
                 if (blessed $set) {
                     for my $alias ( keys %{ $found->{alias} } ) {
@@ -38,11 +43,6 @@ sub _given_when {
                 } else {
                     map { $set->{$_} = $set->{$found->{alias}->{$_}} } keys %{ $found->{alias} };
                 }
-            }
-
-            if ( $found->{run} ) { 
-                my @new = $found->{run}->( $self, $find, $set, );
-                $set = scalar @new > 1 ? \@new : shift @new;
             }
 
             $self->variant_last_value->{$attr}->{set} = $set;

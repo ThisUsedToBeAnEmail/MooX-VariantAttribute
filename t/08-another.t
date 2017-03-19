@@ -60,22 +60,25 @@ is $object->hello('seven'), 'one';
 is $object->hello, 'one';
 
 {
-    package Backwards::World::ro;
+    package Backwards::World::Goodbye;
     use Moo;
     use MooX::VariantAttribute;
     use Types::Standard qw/Any/;
 
-    variant hello => (
+    variant goodbye => (
         given => Any,
         when => [
             { one => 'two' } => {
-                run => sub { return keys %{ $_[2] } },
+                alias => {
+                    three => 'one',
+                }
             },
         ],
     );
+
 }
 
-my $object2 = Backwards::World::ro->new( hello => { one => 'two' } );
-is $object->hello, 'one';
+my $object2 = Backwards::World::Goodbye->new( goodbye => { one => 'two' } );
+is_deeply $object2->goodbye, { one => 'two', three => 'two' };
 
 done_testing();
