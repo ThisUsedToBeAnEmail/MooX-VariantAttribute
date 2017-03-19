@@ -62,11 +62,12 @@ sub _struct_the_same {
     my $stored_ref = ref($stored) || ref(\$stored);
     my $passed_ref = ref($passed) || ref(\$passed);
     $stored_ref eq $passed_ref or return undef;
-    
+     
     if ( $stored_ref eq 'SCALAR') {
-        return ($stored =~ m/^$passed$/) ? 1 : undef;
+          return ($stored =~ m/^$passed$/) ? 1 : undef;
     } elsif ($stored_ref eq 'HASH') {
         for (keys %{$passed}) {
+            $stored->{$_} or return undef;
             _struct_the_same($stored->{$_}, $passed->{$_}) or return undef;    
         }
         return 1;

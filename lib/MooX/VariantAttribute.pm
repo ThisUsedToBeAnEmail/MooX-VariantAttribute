@@ -5,7 +5,7 @@ use warnings;
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
 use MooX::ReturnModifiers;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub import {
     my ( $package, @import ) = @_;
@@ -39,7 +39,6 @@ sub _construct_attribute {
     return (
         is => $spec{is} ? $spec{is} : 'rw',
         trigger => $trigger,
-        lazy => 1,
     );
 }
 
@@ -53,7 +52,7 @@ MooX::VariantAttribute - a щ（ﾟДﾟщ）Attribute...
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -62,10 +61,11 @@ Version 0.02
     package My::Multi::Parser
     use Moo;
     use MooX::VariantAttribute;
+    use Type::Standards qw/Obj/;
 
     # variant accepts everything - has - does
     variant parser => (
-        is  => 'ro',
+        given => Obj,
         when => [
             'Test::Parser::One' => {
                 alias => {
@@ -83,6 +83,26 @@ Version 0.02
                 alias => { 
                     parse_string => 'meth_one',
                     parse_file   => 'meth_two', 
+                },
+            },
+        ],
+    );
+
+    variant refs => (
+        given => sub { ref $_[1] or ref \$_[1] }, 
+        when => [
+            'SCALAR' => { 
+                run => sub { return "refs returned - SCALAR - $_[1]" },
+            },
+            'HASH' => {
+                run => sub { 
+                    return "refs returned - HASH - " . 
+                        join ',', map { sprintf '%s=>%s', $_, $_[1]->{$_} } keys %{ $_[1] }; 
+                },
+            },
+            'ARRAY' => {
+                run => sub { 
+                    return "refs returned - ARRAY - " . join ',', @{ $_[1] } 
                 },
             },
         ],
