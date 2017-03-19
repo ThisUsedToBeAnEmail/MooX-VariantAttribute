@@ -2,7 +2,7 @@ package MooX::VariantAttribute::Role;
 
 use Moo::Role;
 use Carp qw/croak/;
-use Scalar::Util qw/blessed refaddr reftype/;
+use Scalar::Util qw/refaddr reftype/;
 
 has variant_last_value => (
     is      => 'rw',
@@ -36,10 +36,12 @@ sub _given_when {
                 }
             }
 
-            $found->{run} and $set = $found->{run}->( $self, $find, $set, );
+            if ( $found->{run} ) { 
+                my @new = $found->{run}->( $self, $find, $set, );
+                $set = scalar @new > 1 ? \@new : shift @new;
+            }
 
             $self->variant_last_value->{$attr}->{set} = $set;
-
             return $self->$attr($set);
         }
     }
@@ -75,13 +77,16 @@ sub _struct_the_same {
     if ( $stored_ref eq 'SCALAR') {
           return ($stored =~ m/^$passed$/) ? 1 : undef;
     } elsif ($stored_ref eq 'HASH') {
-        for (keys %{$passed}) {
-            $stored->{$_} or return undef;
+        my %cry = (%{$passed}, %{$stored});
+        for (keys %cry) {
+            $stored->{$_} and $passed->{$_} or return undef;
             _struct_the_same($stored->{$_}, $passed->{$_}) or return undef;    
         }
         return 1;
     } elsif ($stored_ref eq 'ARRAY') {
-        for ( scalar @{$passed} - 1 ) {
+        my @count = (scalar @{$stored}, scalar @{$passed});
+        $count[0] == $count[1] or return undef;
+        for ( 0 .. $count[1] - 1 ) {
             _struct_the_same($stored->[$_], $passed->[$_]) or return undef;
         }
         return 1;
