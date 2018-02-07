@@ -3,6 +3,7 @@ package MooX::VariantAttribute::Role;
 use Moo::Role;
 use Carp qw/croak/;
 use Scalar::Util qw/blessed refaddr reftype/;
+use Combine::Keys qw/combine_keys/;
 
 has variant_last_value => (
     is      => 'rw',
@@ -12,14 +13,13 @@ has variant_last_value => (
 
 sub _given_when {
     my ($self) = shift;
-    my ( $set, $given, $when, $attr ) = @_;
+    my ( $set, $given, $when, $attr, $run ) = @_;
 
     return if $self->_variant_last_value($attr, 'set', $set);
 
     my $find = $self->_find_from_given(@_);
-   
+
     $self->variant_last_value->{$attr}->{find} = $find;
-    
     my @when = @{ $when };
     while (scalar @when >= 2) {
         my $check = shift @when;
@@ -40,8 +40,10 @@ sub _given_when {
                 }
             }
 
-            if ( $found->{run} ) { 
-                my @new = $found->{run}->( $self, $find, $set, );
+            if ( $run = $found->{run} ) { 
+				my @new = ref $run eq 'CODE' 
+                    ? $found->{run}->( $self, $find, $set, ) 
+                    : $self->$run($find, $set);
                 $set = scalar @new > 1 ? \@new : shift @new;
             }
 
@@ -57,8 +59,8 @@ sub _given_when {
 sub _variant_last_value {
     my ($self, $attr, $value, $set) = @_;
 
-    $self->variant_last_value->{$attr}->{$value} or return undef;
-    return _ref_the_same($self->variant_last_value->{$attr}->{$value}, $set);
+    my $stored = $self->variant_last_value->{$attr}->{$value} or return undef;
+    return _ref_the_same($stored, $set);
 }
 
 sub _ref_the_same {
@@ -81,8 +83,7 @@ sub _struct_the_same {
     if ( $stored_ref eq 'SCALAR') {
           return ($stored =~ m/^$passed$/) ? 1 : undef;
     } elsif ($stored_ref eq 'HASH') {
-        my %cry = (%{$passed}, %{$stored});
-        for (keys %cry) {
+        for (combine_keys($stored, $passed)) {
             $stored->{$_} and $passed->{$_} or return undef;
             _struct_the_same($stored->{$_}, $passed->{$_}) or return undef;    
         }
@@ -104,14 +105,11 @@ sub _find_from_given {
 
     my $ref_given = ref $given;
     if ( $ref_given eq 'Type::Tiny' ) {
-        my $display_name = $given->display_name;
         $set = $given->($set);
-        $display_name eq 'Object' and return ref $set;
-        return $set;
+        return $given->display_name eq 'Object' ? ref $set : $set;
     }
     elsif ( $ref_given eq 'CODE' ) {
-        my $val = $given->( $self, $set );
-        return $val;
+        return $given->( $self, $set );
     }
 
     return $set;

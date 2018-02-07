@@ -236,7 +236,63 @@ is $object5->hello, 'one';
 my $object5 = Backwards::World::Lazy->new();
 is $object5->hello, 'one';
 
+{
+    package Backwards::World::Subs;
+    use Moo;
+    use MooX::VariantAttribute;
+    use Types::Standard qw/Any/;
 
+    variant hello => (
+        given => Any,
+        when => [
+            { one => 'two' } => {
+                run => 'one',
+            },
+            { three => 'four' } => {
+                run => 'two',
+            },
+            [ qw/five six/ ] => {
+                run => 'three',
+            },
+            seven => {
+                run => 'four',
+            }
+        ],
+        builder => 1,
+    );
 
+    sub _build_hello {
+        return { one => 'two' };
+    }
+
+    sub one {
+        return 'one';
+    }
+
+    sub two {
+        return 'two';
+    }
+    
+    sub three {
+        return 'three';
+    }
+
+    sub four {
+        return $_[0]->hello({ one => 'two' });
+    }
+
+}
+
+my $object6 = Backwards::World::Subs->new();
+is $object6->hello, 'one';
+
+is $object6->hello({ three => 'four' }), 'two';
+is $object6->hello, 'two';
+
+is $object6->hello([ qw/five six/ ]), 'three';
+is $object6->hello, 'three';
+
+is $object6->hello('seven'), 'one';
+is $object6->hello, 'one';
 
 done_testing();

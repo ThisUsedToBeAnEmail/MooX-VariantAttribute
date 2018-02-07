@@ -3,9 +3,8 @@ package MooX::VariantAttribute;
 use strict;
 use warnings;
 use Carp qw/croak/;
-use Scalar::Util qw/blessed/;
 use MooX::ReturnModifiers;
-our $VERSION = '0.04';
+our $VERSION = '0.08';
 
 sub import {
     my ( $package, @import ) = @_;
@@ -62,9 +61,21 @@ sub _construct_attribute {
                 }
             ) : ()
         ),
+        (
+            $spec{builder} ? (
+                builder => ref $spec{builder} eq 'CODE' ? sub {
+                    return $_[0]->_given_when(
+                        $spec{builder}->(),
+                        $spec{given},
+                        $spec{when},
+                        $name
+                    );
+                } : $spec{builder}
+            ) : ()
+        ),
         (map {(
             $spec{$_} ? ( $_ => $spec{$_} ) : ()
-        )} qw/builder lazy predicate clearer required reader writer/),
+        )} qw/lazy predicate clearer required reader writer/),
     );
 }
 
@@ -72,15 +83,15 @@ sub _construct_attribute {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 MooX::VariantAttribute - a щ（ﾟДﾟщ）Attribute...
 
 =head1 VERSION
 
-Version 0.04
-
-=cut
+Version 0.08
 
 =head1 SYNOPSIS
 
@@ -185,15 +196,16 @@ with a trigger.
 
 These attributes have to be read-write as the trigger is used to set the final *stored* value.
 
-The Variants should always have two key/value pairs, given and when, given accepts a code reference or L<Type::Tiny> object. When the code 
-reference is called two parameters are passed the first $self the second the $new value. Type::Tiny objects are called with 
-the $new value.
+The Variants should always have two key/value pairs, given and when, given accepts a code reference or L<Type::Tiny> object. 
+When the code reference is called two parameters are passed, the first $self and the second the $new value. Type::Tiny 
+objects are called with just the $new value.
     
-    given => sub { my $self = shift; ref $_[1] },
+    given => sub { my $self = shift; ref $_[0] },
 
-When is well when it gets more complicated. *when* should always be an array reference of pairs. The first value is the *matching* value
-it can be a SCALAR, ARRAY, HASH maybe even an Object. The second value has to be a hash reference with two optional keys run and alias. 
-run should always be a code reference it will be passed $self, the $value returned from given, and the $new value. 
+*when* should always be an array reference of pairs. The first value is the *matching* value it can be an SCALAR, ARRAY, 
+HASH maybe even an Object. The second value has to be an hash reference with two optional keys run and alias. 
+*run* can either be a code reference or a scalar that references a sub routine available to $self, bot will be passed 
+$self, the $value returned from given and the $new passed value.
 
     package Backwards::World;
     use Moo;
@@ -213,10 +225,14 @@ run should always be a code reference it will be passed $self, the $value return
                 run => sub { return $_[2]->[1] },
             },
             seven => {
-                run => sub { return $_[0]->hello({ one => 'two' }) },
+                run => 'seven',
             }
         ],
     );
+
+    sub seven {
+        return $_[0]->hello({ one => 'two' });
+    }
 
     ....
     
@@ -233,12 +249,69 @@ run should always be a code reference it will be passed $self, the $value return
     $object->hello('seven'), # one;
     $object->hello, # one;
 
-You can also set the default value for a variant attribute using a *default* or a *builder*.
+=head2 Variant Attribute Options
+
+=over
+
+=item given
+
+Accepts an code reference.
+
+    given => sub { my $self = shift; return $_[0] },
+
+=item when
+
+Accepts an array reference.
+
+    when => [
+        one => { run => sub { return 'Hey' } },
+    ],
+
+=item default
+
+Accepts any kind of reference, object or scalar.
 
     default => sub { one => two },
     default => { one => two }, 
 
+=item builder
+
+Accepts a scalar, set 1 for the default (_build_$name).
+ 
     builder => 1,
+    builder => '_build_hello',
+
+=item predicate
+
+Accepts a scalar.
+
+    predicate => 'has_hello',
+
+=item clearer
+
+Accepts a scalar, set 1 for the default (clear_$name).
+
+    clearer => 1,
+
+=item required
+
+Accepts a Boolean, Set this if the attribute must be passed on object instantiation.
+    
+    required => 1,
+
+=item reader
+
+Accepts a scalar.
+    
+    reader => 'get_hello',
+
+=item writer
+
+Accepts a scalar.
+
+    writer => 'set_hello',
+
+=back
 
 =head1 AUTHOR
 
@@ -255,7 +328,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
     perldoc MooX::VariantAttribute
-
 
 You can also look for information at:
 
